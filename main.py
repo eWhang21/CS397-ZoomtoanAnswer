@@ -6,12 +6,11 @@ import os.path
 import fnmatch
 from os import path
 
-FOLDER_PATH = "/Users/estherwhang/Documents/Zoom"
+FOLDER_PATH = "/Users/russellmacquarrie/Documents/GitHub/CS397-ZoomtoanAnswer"
 zoomFolder = sys.argv[2]
 
 def videoStartTimestamp():
     start_time = zoomFolder.split(" ")
-    print(start_time[1])
 
 def printFile():
     for filename in [sys.argv[1]]:
@@ -49,38 +48,48 @@ def printNotes():
                         print(end_string)
 
 
-def findStart():
+def findStart(f):
     for filename in [sys.argv[1]]:
-        with open(filename) as f:
+        line = f.readline()
+        if len(line) == 0:
+            return 0
+        cnt = 1
+        while line:
+            # print("Line {}: {}".format(cnt, line.strip()))
+            #print(line.strip())
             line = f.readline()
-            cnt = 1
-            while line:
-                # print("Line {}: {}".format(cnt, line.strip()))
-                #print(line.strip())
-                line = f.readline()
-                cnt += 1
-                if 'START: ' in line.strip():
-                    #print("Start found {}".format(line.strip()))
-                    #print("End found {}".format(line.strip()))
-                    start_string = "Start found {}".format(line.strip())
-                    start_time = start_string.split("START:")
-                    print(start_time[1])
+            if len(line) == 0:
+                return 0
+            cnt += 1
+            if 'START: ' in line.strip():
+                #print("Start found {}".format(line.strip()))
+                #print("End found {}".format(line.strip()))
+                start_string = "Start found {}".format(line.strip())
+                start_time = start_string.split("START:")
+                print(start_time[1])
+                return(start_time[1])
 
-def findEnd():
+
+def findEnd(f):
     for filename in [sys.argv[1]]:
-        with open(filename) as f:
+        line = f.readline()
+        if len(line) == 0:
+            return 0
+        cnt = 1
+        while line:
+            # print("Line {}: {}".format(cnt, line.strip()))
+            # print(line.strip())
             line = f.readline()
-            cnt = 1
-            while line:
-                # print("Line {}: {}".format(cnt, line.strip()))
-               # print(line.strip())
-                line = f.readline()
-                cnt += 1
-                if 'END: ' in line.strip():
-                    #print("End found {}".format(line.strip()))
-                    end_string = "End found {}".format(line.strip())
-                    end_time = end_string.split("END:")
-                    print(end_time[1])
+            if len(line) == 0:
+                return 0
+            cnt += 1
+            if 'END: ' in line.strip():
+                #print("End found {}".format(line.strip()))
+                end_string = "End found {}".format(line.strip())
+                end_time = end_string.split("END:")
+                print(end_time[1])
+                return end_time[1]
+
 
 #retrieve all files in the Zoom directory, searches for input directory, and lists all files so we can access the video
 def listDir(dir):
@@ -105,16 +114,14 @@ def findVideo():
         #if ".mp4" in list[i]:
         #    return list[i]
 
-startTime = 4
-endTime = 10
 
-def splice():
+def splice(startTime, endTime, name):
     # loading video
     clip = VideoFileClip(findVideo())
     # Splice video
     clip = clip.subclip(startTime, endTime)
     #output new video
-    clip.write_videofile("Done.mp4")
+    clip.write_videofile(name + ".mp4")
 
 
 if __name__ == '__main__':
@@ -122,14 +129,19 @@ if __name__ == '__main__':
     print("Full FileSTART")
     printFile()
     print("Full FileEND")
-    findStart()
-    findEnd()
+    starts = []
+    ends = []
+    f = open(sys.argv[1])
+    while True:
+        thisStart = findStart(f)
+        thisEnd = findEnd(f)
+        if (thisStart == 0) or (thisEnd == 0):
+            break
+        starts.append(thisStart)
+        ends.append(thisEnd)
+    print(starts, ends)
     print("all notes")
     printNotes()
     print(findVideo())
     print(sys.path)
    # splice()
-
-
-
-
