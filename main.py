@@ -9,8 +9,17 @@ from os import path
 FOLDER_PATH = "/Users/russellmacquarrie/Documents/GitHub/CS397-ZoomtoanAnswer"
 zoomFolder = sys.argv[2]
 
+def formatTime(time_string):
+    string_list = time_string.split(":")
+    temp = 0
+    for i in range(len(string_list)):
+        temp += int(string_list[i]) * (60**(2-i))
+    return temp
+
 def videoStartTimestamp():
-    start_time = zoomFolder.split(" ")
+    name_list = zoomFolder.split(" ")
+    start_time = name_list[1].replace(".", ":")
+    return start_time
 
 def printFile():
     for filename in [sys.argv[1]]:
@@ -123,9 +132,15 @@ def splice(startTime, endTime, name):
     #output new video
     clip.write_videofile(name + ".mp4")
 
+def calc_splice(starter, starts, ends):
+    start_time = formatTime(starter)
+    for i in range(len(starts)):
+        splice((formatTime(starts[i]) -  start_time), (formatTime(ends[i]) - start_time))
+
+
 
 if __name__ == '__main__':
-    print(videoStartTimestamp())
+    start_time = videoStartTimestamp()
     print("Full FileSTART")
     printFile()
     print("Full FileEND")
@@ -140,6 +155,7 @@ if __name__ == '__main__':
         starts.append(thisStart)
         ends.append(thisEnd)
     print(starts, ends)
+    calc_splice(start_time, starts, ends)
     print("all notes")
     printNotes()
     print(findVideo())
