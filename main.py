@@ -6,7 +6,7 @@ import os.path
 import fnmatch
 from os import path
 
-FOLDER_PATH = "/Users/russellmacquarrie/Documents/GitHub/CS397-ZoomtoanAnswer"
+FOLDER_PATH = "/Users/estherwhang/Documents/Zoom"
 zoomFolder = sys.argv[2]
 
 def formatTime(time_string):
@@ -108,12 +108,12 @@ def listDir(dir):
     #    print(fileName)
 
     # list all files/folders in input folder (the selected meeting)
-    allFileNames = os.listdir(zoomFolder)
+    allFileNames = os.listdir(dir)
     #print(allFileNames)
     return allFileNames
 
 def findVideo():
-    list = listDir(FOLDER_PATH)
+    list = listDir(FOLDER_PATH + "/" + zoomFolder)
     counter = 0
     for i in list:
         #if ".mp4" in i:
@@ -123,20 +123,22 @@ def findVideo():
         #if ".mp4" in list[i]:
         #    return list[i]
 
+def findVideoPath():
+    vidpath = FOLDER_PATH + "/" + zoomFolder + "/" + findVideo()
+    return vidpath
 
 def splice(startTime, endTime, name):
     # loading video
-    clip = VideoFileClip(findVideo())
+    clip = VideoFileClip(findVideoPath())
     # Splice video
     clip = clip.subclip(startTime, endTime)
     #output new video
     clip.write_videofile(name + ".mp4")
 
-def calc_splice(starter, starts, ends):
+def calc_splice(starter, starts, ends, name):
     start_time = formatTime(starter)
-    for i in range(len(starts)):
-        splice((formatTime(starts[i]) -  start_time), (formatTime(ends[i]) - start_time))
-
+    #for i in range(len(starts)):
+    splice((formatTime(starts[i]) - start_time), (formatTime(ends[i]) - start_time), name)
 
 
 if __name__ == '__main__':
@@ -146,6 +148,8 @@ if __name__ == '__main__':
     print("Full FileEND")
     starts = []
     ends = []
+    counter = 0
+    name = ""
     f = open(sys.argv[1])
     while True:
         thisStart = findStart(f)
@@ -154,10 +158,8 @@ if __name__ == '__main__':
             break
         starts.append(thisStart)
         ends.append(thisEnd)
-    print(starts, ends)
-    calc_splice(start_time, starts, ends)
-    print("all notes")
-    printNotes()
-    print(findVideo())
-    print(sys.path)
-   # splice()
+        print(starts, ends)
+    for i in range(len(starts)):
+        nameFile = str(counter)
+        calc_splice(start_time, starts, ends, "name" + nameFile)
+        counter+=1

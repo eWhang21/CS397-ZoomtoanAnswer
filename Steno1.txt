@@ -1,0 +1,40 @@
+Zoom397 test
+
+
+Begin: 3:46:25 PM 10-11-2020
+
+
+
+
+
+
+START: 15:46:39
+
+
+Notes notes1
+Notes1
+Notes1
+
+
+END: 15:46:54
+
+
+
+
+Wait for 3:48 to begin next notest
+
+
+
+
+START: 15:48:01
+
+
+Notes2 more notes2
+Notes2
+Why is my time in CST? Double check that
+
+
+END: 15:49:04
+
+
+bye
