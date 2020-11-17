@@ -5,10 +5,15 @@ import os
 import os.path
 import fnmatch
 from os import path
+from htmldom import htmldom
 
-ZOOM_FOLDER_PATH = "/Users/estherwhang/Documents/Zoom"
-DOWNLOADS_FOLDER_PATH = "/Users/estherwhang/Downloads"
+
+ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer"
+DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"
 notes_txtfile = sys.argv[1]
+dom = htmldom.HtmlDom().createDom("<header> Steno </header>")
+lines = [[]]
+
 #input_zoom_folder = sys.argv[2]
 
 #find most recent file within all zoom recording files
@@ -98,6 +103,7 @@ def findStart(f):
         if len(line) == 0:
             return 0
         cnt = 1
+        cnt2 = 0
         while line:
             # print("Line {}: {}".format(cnt, line.strip()))
             #print(line.strip())
@@ -105,13 +111,16 @@ def findStart(f):
             if len(line) == 0:
                 return 0
             cnt += 1
+            lines[cnt2].append(line)
             if 'START: ' in line.strip():
                 #print("Start found {}".format(line.strip()))
                 #print("End found {}".format(line.strip()))
+                cnt2 += 1
+                lines.append([])
                 start_string = "Start found {}".format(line.strip())
                 start_time = start_string.split("START:")
                 print(start_time[1])
-                return(start_time[1])
+                return (start_time[1])
 
 
 def findEnd(f):
@@ -182,6 +191,14 @@ def calc_splice(starter, starts, ends, name):
     #for i in range(len(starts)):
     splice((formatTime(starts[i]) - start_time), (formatTime(ends[i]) - start_time), name)
 
+def htmlify():
+    all = dom.find("*")
+    for i in range(1, len(lines)):
+        all.add("div[id=" + i + "]").html("<h2>New Note</h2> <video width='320' height='240' controls> <source src='movie.mp4' type='video/mp4'> <source src='movie.ogg' type='video/ogg'> Your browser does not support the video tag. </video>")
+        for j in i:
+            cur = all.find("[" + i + "]")
+            cur.html("<h3>" + j + "</h3>")
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -207,6 +224,7 @@ if __name__ == '__main__':
         nameFile = str(counter)
         calc_splice(start_time, starts, ends, "name" + nameFile)
         counter += 1
+    htmlify()
 
 #  python3 main.py Steno1.txt "2020-11-10 15.46.20 Esther Whang's Zoom Meeting 94237206986"
 #  python3 main.py Steno1.txt
