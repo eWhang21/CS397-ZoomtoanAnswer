@@ -4,12 +4,14 @@ import sys
 import os
 import os.path
 import fnmatch
+import cgi
 from os import path
 
 ZOOM_FOLDER_PATH = "/Users/estherwhang/Documents/Zoom"
 DOWNLOADS_FOLDER_PATH = "/Users/estherwhang/Downloads"
 notes_txtfile = sys.argv[1]
 #input_zoom_folder = sys.argv[2]
+
 
 #find most recent file within all zoom recording files
 def find_most_recent_zoom_folder():
@@ -23,7 +25,6 @@ def find_most_recent_zoom_folder():
             i_file = i.split(" ")
             date = i_file[0]
             time = i_file[1]
-            date_split = date.split("-")
             time_replace = time.replace(".", ":")
             date_list.append(date)
             time_list.append(time_replace)
@@ -56,14 +57,16 @@ def videoStartTimestamp():
     start_time = name_list[1].replace(".", ":")
     return start_time
 
+
+
 def printFile():
     for filename in [sys.argv[1]]:
         with open(filename) as f:
             line = f.readline()
             cnt = 1
             while line:
-                print("Line {}: {}".format(cnt, line.strip()))
-                #print(line.strip())
+                #print("Line {}: {}".format(cnt, line.strip()))
+                print(line.strip())
                 line = f.readline()
                 cnt += 1
 
@@ -188,7 +191,13 @@ if __name__ == '__main__':
         raise Exception("Please enter three arguments: python3 main.py notes.txt_file")
     start_time = videoStartTimestamp()
     # print("Full FileSTART")
-    # printFile()
+    #printFile()
+
+    print("Content-type:/html\n\n")
+    form = cgi.FieldStorage()
+    Title = form.getvalue("Title")
+    print(Title)
+
     # print("Full FileEND")
     starts = []
     ends = []
@@ -205,7 +214,7 @@ if __name__ == '__main__':
         # print(starts, ends)
     for i in range(len(starts)):
         nameFile = str(counter)
-        calc_splice(start_time, starts, ends, "name" + nameFile)
+       #calc_splice(start_time, starts, ends, "name" + nameFile)
         counter += 1
 
 #  python3 main.py Steno1.txt "2020-11-10 15.46.20 Esther Whang's Zoom Meeting 94237206986"
