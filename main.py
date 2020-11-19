@@ -9,7 +9,8 @@ from os import path
 
 
 ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Zoom"
-DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"
+DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"'file:///Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer/'
+SCRIPT_PATH = 'file:///Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer/'
 notes_txtfile = sys.argv[1]
 lines = [[]]
 
@@ -224,7 +225,7 @@ def wrapStringInHTMLMac(program, url,  body):
     f.close()
 
     #Change the filepath variable below to match the location of your directory
-    filename = 'file:///Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer/' + filename
+    filename = SCRIPT_PATH + filename
 
     open_new_tab(filename)
     return
