@@ -9,8 +9,8 @@ from os import path
 
 
 ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Zoom"
-DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"'file:///Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer/'
-SCRIPT_PATH = 'file:///Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer/'
+DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"
+SCRIPT_PATH = "/Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer/"
 notes_txtfile = sys.argv[1]
 lines = [[]]
 
@@ -79,6 +79,8 @@ def printNotes():
         with open(filename) as f:
             line = f.readline()
             cnt = 1
+            cnt2 = 0
+            lines = [[]]
             while line:
                 # print("Line {}: {}".format(cnt, line.strip()))
                 #print(line.strip())
@@ -93,10 +95,14 @@ def printNotes():
                         print("Line {}: {}".format(cnt, line.strip()))
                         # print(line.strip())
                         line = f.readline()
+                        lines[cnt2].append(line)
                         cnt += 1
                     if 'END: ' in line.strip():
+                        cnt2 += 1
+                        lines.append([])
                         end_string = "End found {}".format(line.strip())
                         print(end_string)
+            return lines
 
 
 def findStart(f):
@@ -105,24 +111,23 @@ def findStart(f):
         if len(line) == 0:
             return 0
         cnt = 1
-        cnt2 = 0
-        lines = []
+
         while line:
             # print("Line {}: {}".format(cnt, line.strip()))
             #print(line.strip())
             line = f.readline()
             if len(line) == 0:
-                return 0, lines
+                return 0
             cnt += 1
-            lines.append(line)
+
             if 'START: ' in line.strip():
                 #print("Start found {}".format(line.strip()))
                 #print("End found {}".format(line.strip()))
-                cnt2 += 1
+
                 start_string = "Start found {}".format(line.strip())
                 start_time = start_string.split("START:")
                 print(start_time[1])
-                return (start_time[1]), (lines)
+                return (start_time[1])
 
 
 def findEnd(f):
@@ -248,10 +253,9 @@ if __name__ == '__main__':
     counter = 0
     name = ""
     f = open(findtxtfile())
-    lines = []
+    lines = printNotes()
     while True:
-        thisStart, linetemp = findStart(f)
-        lines.append(linetemp)
+        thisStart= findStart(f)
         thisEnd = findEnd(f)
         if (thisStart == 0) or (thisEnd == 0):
             break
