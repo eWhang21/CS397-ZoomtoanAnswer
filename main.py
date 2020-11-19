@@ -200,9 +200,9 @@ def calc_splice(starter, starts, ends, name):
 
 def htmlify(path, lines):
     out = "<header> Steno </header>"
-    lines.pop(0)
-    lines[0].pop()
+    lines.pop()
     for i in lines:
+        i.pop()
         out += "<div> <h2>New Note</h2> <video width='320' height='240' controls> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video>"
         for j in i:
             out += j
