@@ -6,13 +6,11 @@ import os.path
 import fnmatch
 import cgi
 from os import path
-from htmldom import htmldom
 
 
-ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer"
+ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Zoom"
 DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"
 notes_txtfile = sys.argv[1]
-dom = htmldom.HtmlDom().createDom("<header> Steno </header>")
 lines = [[]]
 
 #input_zoom_folder = sys.argv[2]
@@ -107,23 +105,23 @@ def findStart(f):
             return 0
         cnt = 1
         cnt2 = 0
+        lines = []
         while line:
             # print("Line {}: {}".format(cnt, line.strip()))
             #print(line.strip())
             line = f.readline()
             if len(line) == 0:
-                return 0
+                return 0, lines
             cnt += 1
-            lines[cnt2].append(line)
+            lines.append(line)
             if 'START: ' in line.strip():
                 #print("Start found {}".format(line.strip()))
                 #print("End found {}".format(line.strip()))
                 cnt2 += 1
-                lines.append([])
                 start_string = "Start found {}".format(line.strip())
                 start_time = start_string.split("START:")
                 print(start_time[1])
-                return (start_time[1])
+                return (start_time[1]), (lines)
 
 
 def findEnd(f):
@@ -194,14 +192,42 @@ def calc_splice(starter, starts, ends, name):
     #for i in range(len(starts)):
     splice((formatTime(starts[i]) - start_time), (formatTime(ends[i]) - start_time), name)
 
-def htmlify():
-    all = dom.find("*")
-    for i in range(1, len(lines)):
-        all.add("div[id=" + i + "]").html("<h2>New Note</h2> <video width='320' height='240' controls> <source src='movie.mp4' type='video/mp4'> <source src='movie.ogg' type='video/ogg'> Your browser does not support the video tag. </video>")
+def htmlify(path, lines):
+    out = "<header> Steno </header>"
+    lines.pop(0)
+    lines[0].pop()
+    for i in lines:
+        out += "<div> <h2>New Note</h2> <video width='320' height='240' controls> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video>"
         for j in i:
-            cur = all.find("[" + i + "]")
-            cur.html("<h3>" + j + "</h3>")
+            out += j
+        out += "</div>"
 
+    wrapStringInHTMLMac("Steno", "www.steno.co.uk", out % (path, path))
+
+def wrapStringInHTMLMac(program, url,  body):
+    import datetime
+    from webbrowser import open_new_tab
+
+    now = datetime.datetime.today().strftime("%Y%m%d-%H%M%S")
+    filename = program + '.html'
+    f = open(filename,'w')
+
+    wrapper = """<html>
+    <head>
+    <title>%s output - %s</title>
+    </head>
+    <body><p>URL: <a href=\"%s\">%s</a></p><p>%s</p></body>
+    </html>"""
+
+    whole = wrapper % (program, now, url, url, body)
+    f.write(whole)
+    f.close()
+
+    #Change the filepath variable below to match the location of your directory
+    filename = 'file:///Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer/' + filename
+
+    open_new_tab(filename)
+    return
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -221,8 +247,10 @@ if __name__ == '__main__':
     counter = 0
     name = ""
     f = open(findtxtfile())
+    lines = []
     while True:
-        thisStart = findStart(f)
+        thisStart, linetemp = findStart(f)
+        lines.append(linetemp)
         thisEnd = findEnd(f)
         if (thisStart == 0) or (thisEnd == 0):
             break
@@ -233,7 +261,10 @@ if __name__ == '__main__':
         nameFile = str(counter)
        #calc_splice(start_time, starts, ends, "name" + nameFile)
         counter += 1
-    htmlify()
+    path = findVideoPath()
+    print(path)
+    print(lines)
+    htmlify(path, lines)
 
 #  python3 main.py Steno1.txt "2020-11-10 15.46.20 Esther Whang's Zoom Meeting 94237206986"
 #  python3 main.py Steno1.txt
