@@ -15,10 +15,10 @@ from googleapiclient.http import MediaIoBaseDownload
 
 
 
-ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Zoom"
-DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"
-SCRIPT_PATH = "file:///Users/russellmacquarrie/Documents/GitHub/CS397-ZoomtoanAnswer/"
-WORKING_DIRECTORY = "/Users/russellmacquarrie/Documents/GitHub/CS397-ZoomtoanAnswer"
+ZOOM_FOLDER_PATH = "/Users/estherwhang/Documents/Zoom"
+DOWNLOADS_FOLDER_PATH = "/Users/estherwhang/Downloads"
+SCRIPT_PATH = "file:///Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer/"
+WORKING_DIRECTORY = "/Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer"
 notes_txtfile = sys.argv[1]
 lines = [[]]
 
@@ -262,15 +262,15 @@ def calc_splice(starter, starts, ends, name):
     splice((formatTime(starts[i]) - start_time), (formatTime(ends[i]) - start_time), name)
 
 def htmlify(names, lines):
-    out = "<head> <link rel='stylesheet' href='layout.css'> </head> <header> Steno </header>"
+    out = "<head> <link rel='stylesheet' href='layout.css'> </head> <header id=title> Steno </header><p class='head'>"
     lines.pop()
     noteNum = len(names)
     paths = tuple(findVidPaths(names, noteNum))
-    for i in lines:
-        i.pop()
-        out += "<div> <h2>New Note</h2> <video width='320' height='240' controls> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
-        for j in i:
-            out += j
+    for eachline in lines:
+        eachline.pop()
+        out += "<br><div><h2>New Note</h2> <video width='320' height='240' controls> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
+        for j in eachline:
+            out += j + "<br>"
         out += "</p></div>"
 
     wrapStringInHTMLMac("Steno", "www.steno.co.uk", out % paths)
@@ -287,7 +287,7 @@ def wrapStringInHTMLMac(program, url,  body):
     <head>
     <title>%s output - %s</title>
     </head>
-    <body><p>URL: <a href=\"%s\">%s</a></p>%s</body>
+    <body><p id=url>URL: <a href=\"%s\">%s</a></p>%s</body>
     </html>"""
 
     whole = wrapper % (program, now, url, url, body)
