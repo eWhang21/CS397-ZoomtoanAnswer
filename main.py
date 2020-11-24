@@ -268,9 +268,9 @@ def htmlify(names, lines):
     paths = tuple(findVidPaths(names, noteNum))
     for eachline in lines:
         eachline.pop()
-        out += "<br><div><h2>New Note</h2> <video width='320' height='240' controls> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
+        out += "<h2>New Note</h2> <video class=video width='620' height='540' controls id=video> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
         for j in eachline:
-            out += j + "<br>"
+            out += "<br>" + j + "<br>"
         out += "</p></div>"
 
     wrapStringInHTMLMac("Steno", "www.steno.co.uk", out % paths)

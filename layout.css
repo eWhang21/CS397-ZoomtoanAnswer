@@ -39,6 +39,12 @@ main {
   font-size: 18px;
 }
 
+.video {
+    margin-left: auto;
+    margin-right: auto;
+    display: block
+}
+
 #url {
   font-size: 10px;
 }
