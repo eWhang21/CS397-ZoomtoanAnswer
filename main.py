@@ -238,8 +238,8 @@ def findVidPaths(names, noteNum):
     paths = []
     list = listDir(vidpath)
     counter = 0
-    for i in list:
-        for j in names:
+    for j in names:
+        for i in list:
             if i.startswith(j):
                 paths.append(i)
                 counter+=1
