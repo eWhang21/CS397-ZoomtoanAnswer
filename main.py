@@ -173,8 +173,8 @@ def findtxtfile():
     find_files(notes_txtfile, DOWNLOADS_FOLDER_PATH)
     return find_files(notes_txtfile, DOWNLOADS_FOLDER_PATH)[0]
 
-def findVideo():
-    list = listDir(ZOOM_FOLDER_PATH + "/" + find_most_recent_zoom_folder())
+def findVideo(path):
+    list = listDir(path + "/" + find_most_recent_zoom_folder())
     counter = 0
     for i in list:
         if fnmatch.fnmatch(i, '*.mp4'):
@@ -182,8 +182,23 @@ def findVideo():
         counter+=1
 
 def findVideoPath():
-    vidpath = ZOOM_FOLDER_PATH + "/" + find_most_recent_zoom_folder() + "/" + findVideo()
+    vidpath = ZOOM_FOLDER_PATH + "/" + find_most_recent_zoom_folder() + "/" + findVideo(ZOOM_FOLDER_PATH)
     return vidpath
+
+def findVidPaths(names, noteNum):
+    vidpath = SCRIPT_PATH
+    paths = []
+    list = listDir(vidpath)
+    counter = 0
+    for i in list:
+        for j in names:
+            if i.startswith(j):
+                paths.append(i)
+                counter+=1
+            if counter == noteNum:
+                return paths
+
+
 
 def splice(startTime, endTime, name):
     # loading video
@@ -198,17 +213,19 @@ def calc_splice(starter, starts, ends, name):
     #for i in range(len(starts)):
     splice((formatTime(starts[i]) - start_time), (formatTime(ends[i]) - start_time), name)
 
-def htmlify(path, lines):
-    out = "<header> Steno </header>"
+def htmlify(names, lines):
+    out = "<head> <link rel='stylesheet' href='layout.css'> </head> <header> Steno </header>"
     lines.pop()
+    noteNum = len(names)
+    paths = findVidPaths(names, noteNum)
     for i in lines:
         i.pop()
-        out += "<div> <h2>New Note</h2> <video width='320' height='240' controls> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video>"
+        out += "<div> <h2>New Note</h2> <video width='320' height='240' controls> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
         for j in i:
             out += j
-        out += "</div>"
+        out += "</p></div>"
 
-    wrapStringInHTMLMac("Steno", "www.steno.co.uk", out % (path, path))
+    wrapStringInHTMLMac("Steno", "www.steno.co.uk", out % (paths))
 
 def wrapStringInHTMLMac(program, url,  body):
     import datetime
@@ -222,7 +239,7 @@ def wrapStringInHTMLMac(program, url,  body):
     <head>
     <title>%s output - %s</title>
     </head>
-    <body><p>URL: <a href=\"%s\">%s</a></p><p>%s</p></body>
+    <body><p>URL: <a href=\"%s\">%s</a></p>%s</body>
     </html>"""
 
     whole = wrapper % (program, now, url, url, body)
@@ -262,14 +279,14 @@ if __name__ == '__main__':
         starts.append(thisStart)
         ends.append(thisEnd)
         # print(starts, ends)
+    names = []
     for i in range(len(starts)):
         nameFile = str(counter)
+        names.append("name"+nameFile)
        #calc_splice(start_time, starts, ends, "name" + nameFile)
         counter += 1
-    path = findVideoPath()
-    print(path)
     print(lines)
-    htmlify(path, lines)
+    htmlify(names, lines)
 
 #  python3 main.py Steno1.txt "2020-11-10 15.46.20 Esther Whang's Zoom Meeting 94237206986"
 #  python3 main.py Steno1.txt
