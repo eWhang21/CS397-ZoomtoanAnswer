@@ -21,7 +21,7 @@ END: 15:46:54
 
 
 
-Wait for 3:48 to begin next notest
+Wait for 3:48 to begin next notes!!!
 
 
 
@@ -30,7 +30,7 @@ START: 15:48:01
 
 
 Notes2 more notes2
-Notes2
+Notes2!!!
 Why is my time in CST? Double check that
 
 

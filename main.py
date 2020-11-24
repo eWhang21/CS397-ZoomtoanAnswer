@@ -7,10 +7,18 @@ import fnmatch
 import cgi
 from os import path
 
+#for exporting txt file
+#import os
+import io
+from Google import Create_Service
+from googleapiclient.http import MediaIoBaseDownload
 
-ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Zoom"
-DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"
-SCRIPT_PATH = "file:///Users/russellmacquarrie/Documents/GitHub/CS397-ZoomtoanAnswer/"
+
+
+ZOOM_FOLDER_PATH = "/Users/estherwhang/Documents/Zoom"
+DOWNLOADS_FOLDER_PATH = "/Users/estherwhang/Downloads"
+SCRIPT_PATH = "file:///Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer/"
+WORKING_DIRECTORY = "/Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer"
 notes_txtfile = sys.argv[1]
 lines = [[]]
 
@@ -61,11 +69,42 @@ def videoStartTimestamp():
     start_time = name_list[1].replace(".", ":")
     return start_time
 
+#export txt file from google drive into corresponding (most recent) zoom directory
+def exportFile():
+    CLIENT_SECRET_FILE = "client_secret_290484746034-g2jo5esvo50gs2ckfenl4c172m8rflps.apps.googleusercontent.com.json"
+    API_Name = 'drive'
+    API_Version = "v3"
+    SCOPES = ['https://www.googleapis.com/auth/drive.readonly', 'https://www.googleapis.com/auth/drive.file',
+              'https://www.googleapis.com/auth/drive.readonly', 'https://www.googleapis.com/auth/drive.metadata']
 
+    service = Create_Service(CLIENT_SECRET_FILE, API_Name, API_Version, SCOPES)
+
+    file_id = ["1p_RVPF0YjMOX1z2XZeStz_wEbt4OqOACy2mjLz4-hls"]
+    file_name = [sys.argv[1]]
+
+    for file_id, file_name in zip(file_id, file_name):
+        request = service.files().export_media(fileId=file_id, mimeType='text/plain')
+
+        fh = io.BytesIO()
+        downloader = MediaIoBaseDownload(fd=fh, request=request)
+        done = False
+
+        while not done:
+            status, done = downloader.next_chunk()
+            print("Download Progress {0}".format(status.progress() * 100))
+
+        fh.seek(0)
+
+        most_recent_zoom_folder_path = ZOOM_FOLDER_PATH + "/" + find_most_recent_zoom_folder()
+
+        with open(os.path.join(most_recent_zoom_folder_path, file_name), 'wb') as f:
+            f.write(fh.read())
+            f.close()
 
 def printFile():
+    #f = open(findtxtfile())
     for filename in [sys.argv[1]]:
-        with open(filename) as f:
+        with open(findtxtfile()) as f:
             line = f.readline()
             cnt = 1
             while line:
@@ -76,7 +115,8 @@ def printFile():
 
 def printNotes():
     for filename in [sys.argv[1]]:
-        with open(filename) as f:
+        with open(findtxtfile()) as f:
+        #with open(filename) as f:
             line = f.readline()
             cnt = 1
             cnt2 = 0
@@ -168,10 +208,18 @@ def find_files(filename, search_path):
             result.append(os.path.join(root, filename))
     return result
 
-#find txt file in downloads folder
+###         find txt file in downloads folder
+#def findtxtfile():
+#    find_files(notes_txtfile, DOWNLOADS_FOLDER_PATH)
+#    return find_files(notes_txtfile, DOWNLOADS_FOLDER_PATH)[0]
+
+###         find txt file in most recent zoom folder
 def findtxtfile():
-    find_files(notes_txtfile, DOWNLOADS_FOLDER_PATH)
-    return find_files(notes_txtfile, DOWNLOADS_FOLDER_PATH)[0]
+    most_recent_zoom_folder_path = ZOOM_FOLDER_PATH + "/" + find_most_recent_zoom_folder()
+
+    #find_files(notes_txtfile, most_recent_zoom_folder_path)
+    #return find_files(notes_txtfile, most_recent_zoom_folder_path)[0]
+    return most_recent_zoom_folder_path + "/" + sys.argv[1]
 
 def findVideo(path):
     list = listDir(path + "/" + find_most_recent_zoom_folder())
@@ -253,11 +301,11 @@ def wrapStringInHTMLMac(program, url,  body):
     return
 
 if __name__ == '__main__':
+    exportFile()
     if len(sys.argv) < 2:
         raise Exception("Please enter three arguments: python3 main.py notes.txt_file")
     start_time = videoStartTimestamp()
     # print("Full FileSTART")
-    #printFile()
 
     print("Content-type:/html\n\n")
     form = cgi.FieldStorage()
@@ -269,10 +317,11 @@ if __name__ == '__main__':
     ends = []
     counter = 0
     name = ""
+    print(findtxtfile())
     f = open(findtxtfile())
     lines = printNotes()
     while True:
-        thisStart= findStart(f)
+        thisStart = findStart(f)
         thisEnd = findEnd(f)
         if (thisStart == 0) or (thisEnd == 0):
             break
