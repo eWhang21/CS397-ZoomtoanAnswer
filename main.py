@@ -15,10 +15,10 @@ from googleapiclient.http import MediaIoBaseDownload
 
 
 
-ZOOM_FOLDER_PATH = "/Users/estherwhang/Documents/Zoom"
-DOWNLOADS_FOLDER_PATH = "/Users/estherwhang/Downloads"
-SCRIPT_PATH = "file:///Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer/"
-WORKING_DIRECTORY = "/Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer"
+ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Zoom"
+DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"
+SCRIPT_PATH = "file:///Users/russellmacquarrie/Documents/GitHub/CS397-ZoomtoanAnswer/"
+WORKING_DIRECTORY = "/Users/russellmacquarrie/Documents/GitHub/CS397-ZoomtoanAnswer"
 notes_txtfile = sys.argv[1]
 lines = [[]]
 
@@ -234,7 +234,7 @@ def findVideoPath():
     return vidpath
 
 def findVidPaths(names, noteNum):
-    vidpath = SCRIPT_PATH
+    vidpath = WORKING_DIRECTORY
     paths = []
     list = listDir(vidpath)
     counter = 0
@@ -265,7 +265,7 @@ def htmlify(names, lines):
     out = "<head> <link rel='stylesheet' href='layout.css'> </head> <header> Steno </header>"
     lines.pop()
     noteNum = len(names)
-    paths = findVidPaths(names, noteNum)
+    paths = tuple(findVidPaths(names, noteNum))
     for i in lines:
         i.pop()
         out += "<div> <h2>New Note</h2> <video width='320' height='240' controls> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
@@ -273,7 +273,7 @@ def htmlify(names, lines):
             out += j
         out += "</p></div>"
 
-    wrapStringInHTMLMac("Steno", "www.steno.co.uk", out % (paths))
+    wrapStringInHTMLMac("Steno", "www.steno.co.uk", out % paths)
 
 def wrapStringInHTMLMac(program, url,  body):
     import datetime
