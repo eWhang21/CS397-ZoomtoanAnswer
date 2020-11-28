@@ -15,10 +15,10 @@ from googleapiclient.http import MediaIoBaseDownload
 
 
 
-ZOOM_FOLDER_PATH = "/Users/estherwhang/Documents/Zoom"
-DOWNLOADS_FOLDER_PATH = "/Users/estherwhang/Downloads"
-SCRIPT_PATH = "file:///Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer/"
-WORKING_DIRECTORY = "/Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer"
+ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Zoom"
+DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"
+SCRIPT_PATH = "file:///Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer/"
+WORKING_DIRECTORY = "/Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer"
 notes_txtfile = sys.argv[1]
 lines = [[]]
 
@@ -127,6 +127,8 @@ def printNotes():
                 line = f.readline()
                 cnt += 1
                 if 'START: ' in line.strip():
+                    cnt2 += 1
+                    lines.append([])
                     #print("Start found {}".format(line.strip()))
                     #print("End found {}".format(line.strip()))
                     start_string = "Start found {}".format(line.strip())
@@ -135,13 +137,15 @@ def printNotes():
                         print("Line {}: {}".format(cnt, line.strip()))
                         # print(line.strip())
                         line = f.readline()
-                        lines[cnt2].append(line)
+                        lines[cnt2].append([line, "note"])
                         cnt += 1
                     if 'END: ' in line.strip():
                         cnt2 += 1
                         lines.append([])
                         end_string = "End found {}".format(line.strip())
                         print(end_string)
+                elif line != '\n':
+                    lines[cnt2].append([line, "notnote"])
             return lines
 
 
@@ -263,16 +267,20 @@ def calc_splice(starter, starts, ends, name):
 
 def htmlify(names, lines):
     out = "<head> <link rel='stylesheet' href='layout.css'> </head> <header id=title> Steno </header><p class='head'>"
-    lines.pop()
+    lines.pop(0)
     noteNum = len(names)
     paths = tuple(findVidPaths(names, noteNum))
     for eachline in lines:
-        eachline.pop()
-        out += "<h2>New Note</h2> <video class=video width='620' height='540' controls id=video> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
+        if eachline[0][1] == 'note':
+            eachline.pop()
+            out += "<h2>New Note</h2> <video class=video width='620' height='540' controls id=video> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
+        else:
+            out += "<h2>New Note</h2> <p class='notes'>"
         for j in eachline:
-            out += "<br>" + j + "<br>"
+            out += "<br>" + j[0] + "</br>"
         out += "</p></div>"
-
+    print(out)
+    print(paths)
     wrapStringInHTMLMac("Steno", "www.steno.co.uk", out % paths)
 
 def wrapStringInHTMLMac(program, url,  body):
@@ -334,7 +342,6 @@ if __name__ == '__main__':
         names.append("name"+nameFile)
        #calc_splice(start_time, starts, ends, "name" + nameFile)
         counter += 1
-    print(lines)
     htmlify(names, lines)
 
 #  python3 main.py Steno1.txt "2020-11-10 15.46.20 Esther Whang's Zoom Meeting 94237206986"
