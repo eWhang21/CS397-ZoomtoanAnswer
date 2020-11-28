@@ -15,10 +15,10 @@ from googleapiclient.http import MediaIoBaseDownload
 
 
 
-ZOOM_FOLDER_PATH = "/Users/russellmacquarrie/Documents/Zoom"
-DOWNLOADS_FOLDER_PATH = "/Users/russellmacquarrie/Downloads"
-SCRIPT_PATH = "file:///Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer/"
-WORKING_DIRECTORY = "/Users/russellmacquarrie/Documents/Github/CS397-ZoomtoanAnswer"
+ZOOM_FOLDER_PATH = "/Users/estherwhang/Documents/Zoom"
+DOWNLOADS_FOLDER_PATH = "/Users/estherwhang/Downloads"
+SCRIPT_PATH = "file:///Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer/"
+WORKING_DIRECTORY = "/Users/estherwhang/Desktop/SeniorYear/CS397Zoom/CS397-ZoomtoanAnswer"
 notes_txtfile = sys.argv[1]
 lines = [[]]
 
@@ -30,6 +30,7 @@ def find_most_recent_zoom_folder():
     list = listDir(ZOOM_FOLDER_PATH)
     date_list = []
     time_list = []
+    same_date_list = []
     same_day_time_list = []
 
     for i in list:
@@ -41,19 +42,41 @@ def find_most_recent_zoom_folder():
             date_list.append(date)
             time_list.append(time_replace)
             time_list = sorted(time_list, reverse=True)
-
-            if date == max(date_list):
+    MAX = max(date_list)
+    counter = 0
+    print(MAX)
+#count number of times zoom folders of same date occurs
+    for x in list:
+        if x != ".DS_Store":
+            x_file = x.split(" ")
+            date = x_file[0]
+            time = x_file[1]
+            #print(time)
+            if date == MAX:
                 same_day_time_list.append(time)
+                counter +=1
+    print(counter)
+    print(same_day_time_list)
 
-    #find most recent date: max(date_list)
-    #how many times most recent date occured
-    if date_list.count(max(date_list)) == 0:
-        raise Exception("No files recorded Zoom files exist.")
-    if date_list.count(max(date_list)) >= 1:
+#if there is only one video with most recent date
+    if counter == 1:
         for j in list:
             file_split = j.split(" ")
-            if file_split[0] == max(date_list) and file_split[1] == max(same_day_time_list):
+            if file_split[0] == max(date_list):
+                #print(j)
                 return j
+
+#if there is multple videos w most recent date
+
+    if counter != 1:
+        if counter == 0:
+            raise Exception("No files recorded Zoom files exist.")
+        else:
+            for j in list:
+                file_split = j.split(" ")
+                if file_split[0] == max(date_list) and file_split[1] == max(same_day_time_list):
+                        #print(j)
+                        return j
 
 
 def formatTime(time_string):
@@ -138,6 +161,7 @@ def printNotes():
                         # print(line.strip())
                         line = f.readline()
                         lines[cnt2].append([line, "note"])
+
                         cnt += 1
                     if 'END: ' in line.strip():
                         cnt2 += 1
@@ -258,7 +282,7 @@ def splice(startTime, endTime, name):
     # Splice video
     clip = clip.subclip(startTime, endTime)
     #output new video
-    clip.write_videofile(name + ".mp4")
+    clip.write_videofile(name +".mp4")
 
 def calc_splice(starter, starts, ends, name):
     start_time = formatTime(starter)
@@ -273,7 +297,7 @@ def htmlify(names, lines):
     for eachline in lines:
         if eachline[0][1] == 'note':
             eachline.pop()
-            out += "<h2>New Note</h2> <video class=video width='620' height='540' controls id=video> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
+            out += "<h2>New Note</h2> <video class=video width='800' height='500' controls id=video> <source src='%s' type='video/mp4'> Your browser does not support the video tag. </video> <p class='notes'>"
         else:
             out += "<h2>New Note</h2> <p class='notes'>"
         for j in eachline:
@@ -282,6 +306,7 @@ def htmlify(names, lines):
     print(out)
     print(paths)
     wrapStringInHTMLMac("Steno", "www.steno.co.uk", out % paths)
+
 
 def wrapStringInHTMLMac(program, url,  body):
     import datetime
@@ -309,40 +334,4 @@ def wrapStringInHTMLMac(program, url,  body):
     return
 
 if __name__ == '__main__':
-    exportFile()
-    if len(sys.argv) < 2:
-        raise Exception("Please enter three arguments: python3 main.py notes.txt_file")
-    start_time = videoStartTimestamp()
-    # print("Full FileSTART")
-
-    print("Content-type:/html\n\n")
-    form = cgi.FieldStorage()
-    Title = form.getvalue("Title")
-    print(Title)
-
-    # print("Full FileEND")
-    starts = []
-    ends = []
-    counter = 0
-    name = ""
-    print(findtxtfile())
-    f = open(findtxtfile())
-    lines = printNotes()
-    while True:
-        thisStart = findStart(f)
-        thisEnd = findEnd(f)
-        if (thisStart == 0) or (thisEnd == 0):
-            break
-        starts.append(thisStart)
-        ends.append(thisEnd)
-        # print(starts, ends)
-    names = []
-    for i in range(len(starts)):
-        nameFile = str(counter)
-        names.append("name"+nameFile)
-       #calc_splice(start_time, starts, ends, "name" + nameFile)
-        counter += 1
-    htmlify(names, lines)
-
-#  python3 main.py Steno1.txt "2020-11-10 15.46.20 Esther Whang's Zoom Meeting 94237206986"
-#  python3 main.py Steno1.txt
+    find_most_recent_zoom_folder()
