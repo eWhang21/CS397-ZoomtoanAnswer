@@ -103,6 +103,7 @@ def exportFile():
     service = Create_Service(CLIENT_SECRET_FILE, API_Name, API_Version, SCOPES)
 
     file_id = ["1p_RVPF0YjMOX1z2XZeStz_wEbt4OqOACy2mjLz4-hls"]
+
     file_name = [sys.argv[1]]
 
     for file_id, file_name in zip(file_id, file_name):
@@ -334,4 +335,44 @@ def wrapStringInHTMLMac(program, url,  body):
     return
 
 if __name__ == '__main__':
-    find_most_recent_zoom_folder()
+    exportFile()
+    if len(sys.argv) < 2:
+        raise Exception("Please enter three arguments: python3 main.py notes.txt_file")
+    start_time = videoStartTimestamp()
+    # print("Full FileSTART")
+
+    print("Content-type:/html\n\n")
+    form = cgi.FieldStorage()
+    Title = form.getvalue("Title")
+    print(Title)
+
+    # print("Full FileEND")
+    starts = []
+    ends = []
+    counter = 0
+    name = ""
+
+    print(findtxtfile())
+    f = open(findtxtfile())
+    print("here")
+    printNotes()
+    lines = printNotes()
+    while True:
+        thisStart = findStart(f)
+        thisEnd = findEnd(f)
+        if (thisStart == 0) or (thisEnd == 0):
+            break
+        starts.append(thisStart)
+        ends.append(thisEnd)
+        # print(starts, ends)
+    names = []
+    print("hi", len(starts))
+    print(starts)
+    for i in range(len(starts)):
+        nameFile = str(counter)
+        print("NAMEFILE:", nameFile)
+        names.append("name" + nameFile)
+        # calc_splice(start_time, starts, ends, "name" + nameFile)
+        counter += 1
+    print(lines)
+    htmlify(names, lines)
